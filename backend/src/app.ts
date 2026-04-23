@@ -45,10 +45,12 @@ app.get("/health", (req: Request, res: Response) => {
 import authRouter from "./modules/auth/auth.routes";
 import inventoryRoutes from "./modules/inventory/inventory.routes";
 import categoryRoutes from "./modules/category/category.routes";
+import supplierRoutes from "./modules/supplier/supplier.routes";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/inventory", inventoryRoutes);
 app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/suppliers", supplierRoutes);
 
 /**
  * -------------------------
