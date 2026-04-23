@@ -1,0 +1,69 @@
+backend/
+├── src/
+│   ├── config/
+│   │   ├── db.js
+│   │   └── env.js
+│
+│   ├── modules/                 # Feature-based structure (BEST PRACTICE)
+│   │   ├── auth/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── auth.service.js
+│   │   │   ├── auth.routes.js
+│   │   │   └── auth.validation.js
+│   │   │
+│   │   ├── product/
+│   │   │   ├── product.controller.js
+│   │   │   ├── product.service.js
+│   │   │   ├── product.routes.js
+│   │   │   └── product.validation.js
+│   │   │
+│   │   ├── inventory/
+│   │   │   ├── inventory.controller.js
+│   │   │   ├── inventory.service.js
+│   │   │   ├── inventory.routes.js
+│   │   │   └── inventory.validation.js
+│   │   │
+│   │   ├── category/
+│   │   │   ├── category.controller.js
+│   │   │   ├── category.service.js
+│   │   │   ├── category.routes.js
+│   │   │
+│   │   ├── supplier/
+│   │   │   ├── supplier.controller.js
+│   │   │   ├── supplier.service.js
+│   │   │   ├── supplier.routes.js
+│   │   │
+│   │   ├── transaction/
+│   │   │   ├── transaction.controller.js
+│   │   │   ├── transaction.service.js
+│   │   │   ├── transaction.routes.js
+│   │   │
+│   │   └── audit/
+│   │       ├── audit.service.js
+│   │
+│
+│   ├── middleware/
+│   │   ├── auth.middleware.js
+│   │   ├── error.middleware.js
+│   │   ├── role.middleware.js
+│   │
+│   ├── utils/
+│   │   ├── apiResponse.js
+│   │   ├── asyncHandler.js
+│   │   ├── constants.js
+│   │
+│   ├── prisma/
+│   │   ├── client.js
+│
+│   ├── routes/
+│   │   └── index.js         # combine all routes
+│
+│   ├── app.js
+│   └── server.js
+│
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+│
+├── .env
+├── package.json

@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(STAFF)
+
+  transactions InventoryTransaction[]
+  auditLogs    AuditLog[]
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+}
+
+model Supplier {
+  id      String  @id @default(uuid())
+  name    String
+  phone   String?
+  address String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id   String @id @default(uuid())
+  name String
+  sku  String @unique
+
+  quantity Int @default(0) // grams (IMPORTANT)
+
+  unit              String @default("g")
+  lowStockThreshold Int    @default(500)
+
+  pricePerKg Float?
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId String?
+
+  transactions InventoryTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+}
+
+model InventoryTransaction {
+  id String @id @default(uuid())
+
+  type     TransactionType
+  quantity Int // grams
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  note String?
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+enum TransactionType {
+  IN
+  OUT
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  action    String
+  tableName String
+  recordId  String?
+
+  oldData Json?
+  newData Json?
+
+  createdAt DateTime @default(now())
+}
