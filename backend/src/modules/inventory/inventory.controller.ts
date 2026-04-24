@@ -1,28 +1,39 @@
 import { Request, Response } from "express";
 import * as inventoryService from "./inventory.service";
-import { stockSchema } from "./inventory.validation";
-import { AuthRequest } from "../../middleware/auth.middleware";
+import { stockInSchema, stockOutSchema } from "./inventory.validation";
 
-export const stockIn = async (req: AuthRequest, res: Response) => {
-  const data = stockSchema.parse(req.body);
+// Stock IN
+export const stockIn = async (req: Request, res: Response) => {
+  const parsed = stockInSchema.parse(req.body);
 
-  const result = await inventoryService.stockIn(data, req.user.userId);
+  const result = await inventoryService.stockIn(parsed, req.user?.id);
 
-  res.json({
+  res.status(200).json({
     success: true,
-    message: "Stock added successfully",
+    message: "Stock added",
     data: result,
   });
 };
 
-export const stockOut = async (req: AuthRequest, res: Response) => {
-  const data = stockSchema.parse(req.body);
+// Stock OUT
+export const stockOut = async (req: Request, res: Response) => {
+  const parsed = stockOutSchema.parse(req.body);
 
-  const result = await inventoryService.stockOut(data, req.user.userId);
+  const result = await inventoryService.stockOut(parsed, req.user?.id);
+
+  res.status(200).json({
+    success: true,
+    message: "Stock removed",
+    data: result,
+  });
+};
+
+// History
+export const getTransactions = async (req: Request, res: Response) => {
+  const data = await inventoryService.getTransactions();
 
   res.json({
     success: true,
-    message: "Stock removed successfully",
-    data: result,
+    data,
   });
 };

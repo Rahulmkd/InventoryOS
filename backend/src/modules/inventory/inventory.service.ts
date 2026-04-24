@@ -1,74 +1,124 @@
+import { TransactionType } from "@prisma/client";
 import prisma from "../../prisma/client";
-import { StockInput } from "./inventory.types";
 
-export const stockIn = async (data: StockInput, userId: string) => {
-  const { productId, quantity, note } = data;
+// STOCK IN (Purchase)
+export const stockIn = async (
+  data: {
+    productId: string;
+    quantity: number;
+    note?: string;
+  },
+  userId?: string,
+) => {
+  return prisma.$transaction(async (tx) => {
+    // 1. Check product
 
-  return await prisma.$transaction(async (tx) => {
-    // 1. Update product stock
-    const product = await tx.product.update({
-      where: { id: productId },
+    const product = await tx.product.findUnique({
+      where: { id: data.productId },
+    });
+
+    if (!product) throw new Error("Product not found");
+
+    // 2. Update quantity
+    const updatedProduct = await tx.product.update({
+      where: { id: data.productId },
       data: {
-        quantity: {
-          increment: quantity,
-        },
+        quantity: product.quantity + data.quantity,
       },
     });
 
-    // 2. Log transaction
+    // 3. Create transaction record
     const transaction = await tx.inventoryTransaction.create({
       data: {
-        productId,
-        quantity,
-        type: "IN",
+        type: TransactionType.IN,
+        quantity: data.quantity,
+        productId: data.productId,
         userId,
-        note,
+        note: data.note,
       },
     });
 
-    return { product, transaction };
+    // 4. Audit log
+    await tx.auditLog.create({
+      data: {
+        userId,
+        action: "STOCK_IN",
+        tableName: "Product",
+        recordId: data.productId,
+        oldData: { quantity: product.quantity },
+        newData: { quantity: updatedProduct.quantity },
+      },
+    });
+
+    return { updatedProduct, transaction };
   });
 };
 
-export const stockOut = async (data: StockInput, userId: string) => {
-  const { productId, quantity, note } = data;
-
-  return await prisma.$transaction(async (tx) => {
-    // 1. Get product
+//  STOCK OUT (Sale)
+export const stockOut = async (
+  data: {
+    productId: string;
+    quantity: number;
+    note?: string;
+  },
+  userId?: string,
+) => {
+  return prisma.$transaction(async (tx) => {
     const product = await tx.product.findUnique({
-      where: { id: productId },
+      where: { id: data.productId },
     });
 
-    if (!product) {
-      throw new Error("Product not found");
-    }
+    if (!product) throw new Error("Product not found");
 
-    // 2. Prevent negative stock
-    if (product.quantity < quantity) {
+    // ! Prevent negative stock
+    if (product.quantity < data.quantity) {
       throw new Error("Insufficient stock");
     }
 
-    // 3. Update stock
+    // Update quantity
     const updatedProduct = await tx.product.update({
-      where: { id: productId },
+      where: {
+        id: data.productId,
+      },
       data: {
-        quantity: {
-          decrement: quantity,
-        },
+        quantity: product.quantity - data.quantity,
       },
     });
 
-    // 4. Log transaction
+    // Create transaction
     const transaction = await tx.inventoryTransaction.create({
       data: {
-        productId,
-        quantity,
-        type: "OUT",
+        type: TransactionType.OUT,
+        quantity: data.quantity,
+        productId: data.productId,
         userId,
-        note,
+        note: data.note,
       },
     });
 
-    return { product: updatedProduct, transaction };
+    // Audit log
+    await tx.auditLog.create({
+      data: {
+        userId,
+        action: "STOCK_OUT",
+        tableName: "Product",
+        recordId: data.productId,
+        oldData: { quantity: product.quantity },
+        newData: { quantity: updatedProduct.quantity },
+      },
+    });
+
+    return { updatedProduct, transaction };
+  });
+};
+
+// Transaction History
+export const getTransactions = async () => {
+  return prisma.inventoryTransaction.findMany({
+    include: {
+      product: true,
+      user: true,
+    },
+    orderBy: { createdAt: "desc" },
   });
 };

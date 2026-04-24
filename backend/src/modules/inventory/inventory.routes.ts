@@ -1,10 +1,11 @@
-import express from "express";
-import { authMiddleware } from "../../middleware/auth.middleware";
-import { stockIn } from "./inventory.controller";
+import { Router } from "express";
+import * as inventoryController from "./inventory.controller";
 
-const router = express.Router();
+const router = Router();
 
 // Protected routes
-router.route("/in").post(authMiddleware, stockIn);
+router.route("/in").post(inventoryController.stockIn);
+router.route("/out").post(inventoryController.stockOut);
+router.route("/history").get(inventoryController.getTransactions);
 
 export default router;
