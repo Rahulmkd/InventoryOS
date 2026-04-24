@@ -18,15 +18,36 @@ model User {
   password String
   role     Role   @default(STAFF)
 
+  // 🔐 Auth Sessions
+  refreshTokens RefreshToken[]
+
+  // 📦 Business Relations
   transactions InventoryTransaction[]
   auditLogs    AuditLog[]
 
   createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 enum Role {
   ADMIN
   STAFF
+}
+
+model RefreshToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Category {
@@ -54,7 +75,7 @@ model Product {
   name String
   sku  String @unique
 
-  quantity Int @default(0) // grams (IMPORTANT)
+  quantity Int @default(0) // grams
 
   unit              String @default("g")
   lowStockThreshold Int    @default(500)

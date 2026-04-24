@@ -1,9 +1,21 @@
-import express from "express";
-import { login, register } from "./auth.controller";
+import { Router } from "express";
+import * as authController from "./auth.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
-const router = express.Router();
+const router = Router();
 
-router.route("/register").post(register);
-router.route("/login").post(login);
+/**
+ * Public Routes
+ */
+
+router.route("/register").post(authController.refresh);
+router.route("/login").post(authController.login);
+
+/**
+ * Protected Routes
+ */
+
+router.route("/logout").post(authController.logout);
+router.route("/loglogout-allout").post(authenticate, authController.logoutAll);
 
 export default router;

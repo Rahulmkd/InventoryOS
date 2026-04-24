@@ -1,10 +1,10 @@
-export class ApiResponse {
+export class ApiResponse<T> {
   success: boolean;
   statusCode: number;
-  data: any;
+  data: T;
   message: string;
 
-  constructor(statusCode: number, data: any, message = "Success") {
+  constructor(statusCode: number, data: T, message = "Success") {
     this.success = true;
     this.statusCode = statusCode;
     this.data = data;

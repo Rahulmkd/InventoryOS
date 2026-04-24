@@ -1,11 +1,12 @@
 import { Router } from "express";
 import * as supplierController from "./supplier.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
 const router = Router();
 
 router
   .route("/")
-  .post(supplierController.createSupplier)
+  .post(authenticate, supplierController.createSupplier)
   .get(supplierController.getAllSuppliers);
 
 router

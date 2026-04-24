@@ -3,6 +3,14 @@ import { z } from "zod";
 
 dotenv.config();
 
+/**
+ * Allowed JWT durations (strict & type-safe)
+ */
+const jwtExpiresEnum = z.enum(["15m", "30m", "1h", "6h", "12h", "1d", "7d"]);
+
+/**
+ * ENV VALIDATION SCHEMA
+ */
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
@@ -11,21 +19,33 @@ const envSchema = z.object({
   PORT: z
     .string()
     .default("5000")
-    .transform((val) => parseInt(val, 10)),
+    .transform((val) => Number(val)),
 
   DATABASE_URL: z.string().url(),
 
+  // Access Token
   JWT_SECRET: z.string().min(10, "JWT_SECRET must be at least 10 characters"),
+  JWT_EXPIRES_IN: jwtExpiresEnum.default("15m"),
 
-  JWT_EXPIRES_IN: z.string().min(1).default("1d"),
+  // Refresh Token
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(10, "JWT_REFRESH_SECRET must be at least 10 characters"),
+  JWT_REFRESH_EXPIRES_IN: jwtExpiresEnum.default("7d"),
 });
 
-const parsedEnv = envSchema.safeParse(process.env);
+/**
+ * VALIDATE ENV
+ */
+const parsed = envSchema.safeParse(process.env);
 
-if (!parsedEnv.success) {
-  console.error("Invalid environment variables:");
-  console.error(parsedEnv.error.format());
+if (!parsed.success) {
+  console.error(" Invalid environment variables:");
+  console.error(parsed.error.flatten().fieldErrors);
   process.exit(1);
 }
 
-export const env = parsedEnv.data;
+/**
+ * EXPORT CLEAN ENV
+ */
+export const env = parsed.data;

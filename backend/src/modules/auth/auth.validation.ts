@@ -3,11 +3,7 @@ import { z } from "zod";
 /**
  * Common reusable fields
  */
-const email = z
-  .string()
-  .email("Invalid email format")
-  .toLowerCase()
-  .trim();
+const email = z.email("Invalid email format").toLowerCase().trim();
 
 const password = z
   .string()

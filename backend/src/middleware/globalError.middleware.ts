@@ -15,7 +15,7 @@ export const globalErrorHandler = (
 
   // 🔹 Development logging (cleaner)
   if (process.env.NODE_ENV === "development") {
-    console.error("🔥 ERROR:", err);
+    console.error(" ERROR:", err);
   }
 
   // -----------------------------
