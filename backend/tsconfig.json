@@ -3,7 +3,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "module": "ESNext",
+     "module": "CommonJS",
     "moduleResolution": "Bundler",
 
     "target": "ES2022",
@@ -19,7 +19,7 @@
     "types": ["node"],
 
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": false
   },
   "exclude": ["node_modules"],
   "include": ["src"]
