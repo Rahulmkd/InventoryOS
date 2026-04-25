@@ -1,5 +1,5 @@
 import prisma from "../../prisma/client";
-import { AppError } from "../../utils/AppError";
+import { AppError } from "../../utils/app.error";
 
 // Create Category
 export const createCategory = async (data: { name: string }) => {

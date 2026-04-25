@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "./auth.service";
 import { registerUserSchema, loginUserSchema } from "./auth.validation";
-import { ApiResponse } from "../../utils/apiResponse";
-import asyncHandler from "../../utils/asyncHandler";
-import { AppError } from "../../utils/AppError";
+import { ApiResponse } from "../../utils/api.response";
+import asyncHandler from "../../utils/async.handler";
+import { AppError } from "../../utils/app.error";
 
 /**
  * Cookie Options (Production Safe)
@@ -65,7 +65,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const { accessToken, refreshToken } =
     await authService.refreshAccessToken(token);
 
-  // 🔄 Rotate refresh token cookie
+  //  Rotate refresh token cookie
   res.cookie("refreshToken", refreshToken, {
     ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,

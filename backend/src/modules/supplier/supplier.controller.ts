@@ -5,63 +5,68 @@ import {
   supplierParamsSchema,
   updateSupplierSchema,
 } from "./supplier.validation";
+import asyncHandler from "../../utils/async.handler";
+import { ApiResponse } from "../../utils/api.response";
 
 // Create
-export const createSupplier = async (req: Request, res: Response) => {
-  const parsed = createSupplierSchema.parse(req.body);
+export const createSupplier = asyncHandler(
+  async (req: Request, res: Response) => {
+    const parsed = createSupplierSchema.parse(req.body);
 
-  const supplier = await supplierService.createSupplier(parsed);
+    const supplier = await supplierService.createSupplier(parsed);
 
-  res.status(201).json({
-    success: true,
-    message: "Supplier created successfully ",
-    data: supplier,
-  });
-};
+    return res
+      .status(201)
+      .json(new ApiResponse(201, supplier, "Supplier created successfully"));
+  },
+);
 
 // Get All
-export const getAllSuppliers = async (req: Request, res: Response) => {
-  const supplier = await supplierService.getAllSuppliers();
+export const getAllSuppliers = asyncHandler(
+  async (req: Request, res: Response) => {
+    const suppliers = await supplierService.getAllSuppliers();
 
-  res.json({
-    success: true,
-    data: supplier,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, suppliers, "Suppliers fetched successfully"));
+  },
+);
 
 // Get One
-export const getSupplierById = async (req: Request, res: Response) => {
-  const { id } = supplierParamsSchema.parse(req.params);
+export const getSupplierById = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = supplierParamsSchema.parse(req.params);
 
-  const supplier = await supplierService.getSupplierById(id);
+    const supplier = await supplierService.getSupplierById(id);
 
-  res.json({
-    success: true,
-    data: supplier,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, supplier, "Supplier fetched successfully"));
+  },
+);
 
 // Update
-export const updateSupplier = async (req: Request, res: Response) => {
-  const { id } = supplierParamsSchema.parse(req.params);
+export const updateSupplier = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = supplierParamsSchema.parse(req.params);
+    const parsed = updateSupplierSchema.parse(req.body);
 
-  const parsed = updateSupplierSchema.parse(req.body);
-  const supplier = await supplierService.updateSupplier(id, parsed);
+    const supplier = await supplierService.updateSupplier(id, parsed);
 
-  res.json({
-    success: true,
-    message: "Supplier update",
-    data: supplier,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, supplier, "Supplier updated successfully"));
+  },
+);
 
-export const deleteSupplier = async (req: Request, res: Response) => {
-  const { id } = supplierParamsSchema.parse(req.params);
+export const deleteSupplier = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = supplierParamsSchema.parse(req.params);
 
-  await supplierService.deleteSupplier(id);
+    await supplierService.deleteSupplier(id);
 
-  res.json({
-    success: true,
-    message: "Supplier delete",
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Supplier deleted successfully"));
+  },
+);

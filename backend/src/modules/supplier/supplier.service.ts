@@ -1,4 +1,5 @@
 import prisma from "../../prisma/client";
+import { AppError } from "../../utils/app.error";
 
 // Create Supplier
 export const createSupplier = async (data: {
@@ -25,7 +26,7 @@ export const getSupplierById = async (id: string) => {
   });
 
   if (!supplier) {
-    throw new Error("Supplier not found");
+    throw new AppError("Supplier not found", 404);
   }
 
   return supplier;
@@ -46,7 +47,7 @@ export const updateSupplier = async (
   });
 
   if (!existingSupplier) {
-    throw new Error("Supplier not found");
+    throw new AppError("Supplier not found", 404);
   }
 
   const updatedSupplier = await prisma.supplier.update({
@@ -59,6 +60,14 @@ export const updateSupplier = async (
 
 // Delete Supplier
 export const deleteSupplier = async (id: string) => {
+  const existingSupplier = await prisma.supplier.findUnique({
+    where: { id },
+  });
+
+  if (!existingSupplier) {
+    throw new AppError("Supplier not found", 404);
+  }
+
   return prisma.supplier.delete({
     where: { id },
   });

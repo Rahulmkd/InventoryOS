@@ -7,12 +7,12 @@ const router = Router();
 router
   .route("/")
   .post(authenticate, supplierController.createSupplier)
-  .get(supplierController.getAllSuppliers);
+  .get(authenticate, supplierController.getAllSuppliers);
 
 router
   .route("/:id")
-  .get(supplierController.getSupplierById)
-  .put(supplierController.updateSupplier)
-  .delete(supplierController.deleteSupplier);
+  .get(authenticate, supplierController.getSupplierById)
+  .put(authenticate, supplierController.updateSupplier)
+  .delete(authenticate, supplierController.deleteSupplier);
 
 export default router;

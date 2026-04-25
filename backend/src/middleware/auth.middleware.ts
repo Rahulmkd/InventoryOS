@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../prisma/client";
-import { AppError } from "../utils/AppError";
+import { AppError } from "../utils/app.error";
 import { TokenPayload, verifyAccessToken } from "../utils/jwt";
-
 
 /**
  * Extend Express Request

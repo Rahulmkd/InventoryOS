@@ -1,77 +1,81 @@
 import { Request, Response } from "express";
 import * as productService from "./product.service";
+import asyncHandler from "../../utils/async.handler";
 import {
   createProductSchema,
   productParamsSchema,
   updateProductSchema,
 } from "./product.validation";
+import { ApiResponse } from "../../utils/api.response";
 
 // Create
-export const createProduct = async (req: Request, res: Response) => {
-  const parsed = createProductSchema.parse(req.body);
+export const createProduct = asyncHandler(
+  async (req: Request, res: Response) => {
+    const parsed = createProductSchema.parse(req.body);
 
-  const product = await productService.createProduct(parsed);
+    const product = await productService.createProduct(parsed);
 
-  res.status(201).json({
-    success: true,
-    message: "Product create",
-    data: product,
-  });
-};
+    return res
+      .status(201)
+      .json(new ApiResponse(201, product, "Product created"));
+  },
+);
 
 // Get All
-export const getAllProducts = async (req: Request, res: Response) => {
-  const product = await productService.getAllProducts();
+export const getAllProducts = asyncHandler(
+  async (req: Request, res: Response) => {
+    const product = await productService.getAllProducts();
 
-  res.json({
-    success: true,
-    data: product,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, product, "Products fetched successfully"));
+  },
+);
 
 // Get One
-export const getProductById = async (req: Request, res: Response) => {
-  const { id } = productParamsSchema.parse(req.params);
+export const getProductById = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = productParamsSchema.parse(req.params);
 
-  const product = await productService.getProductById(id);
+    const product = await productService.getProductById(id);
 
-  res.json({
-    success: true,
-    data: product,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, product, "Product fetched successfully"));
+  },
+);
 
 // Update
-export const updateProduct = async (req: Request, res: Response) => {
-  const { id } = productParamsSchema.parse(req.params);
-  const parsed = updateProductSchema.parse(req.body);
+export const updateProduct = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = productParamsSchema.parse(req.params);
+    const parsed = updateProductSchema.parse(req.body);
 
-  const product = await productService.updateProduct(id, parsed);
+    const product = await productService.updateProduct(id, parsed);
 
-  res.json({
-    success: true,
-    message: "Product update",
-    data: product,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, product, "Product updated successfully"));
+  },
+);
 
 // Delete
-export const deleteProduct = async (req: Request, res: Response) => {
-  const { id } = productParamsSchema.parse(req.params);
-  await productService.deleteProduct(id);
+export const deleteProduct = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = productParamsSchema.parse(req.params);
+    await productService.deleteProduct(id);
 
-  res.json({
-    success: true,
-    message: "Product Delete",
-  });
-};
+    return res.status(200).json(new ApiResponse(200, null, "Product deleted"));
+  },
+);
 
 // Low Stock
-export const getLowStockProducts = async (req: Request, res: Response) => {
-  const product = await productService.getLowStockProducts();
+export const getLowStockProducts = asyncHandler(
+  async (req: Request, res: Response) => {
+    const products = await productService.getLowStockProducts();
 
-  res.json({
-    success: true,
-    data: product,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, products, "Low stock products fetched"));
+  },
+);

@@ -5,62 +5,66 @@ import {
   createCategorySchema,
   updateCategorySchema,
 } from "./category.validation";
+import asyncHandler from "../../utils/async.handler";
+import { ApiResponse } from "../../utils/api.response";
 
 // Create
-export const createCategory = async (req: Request, res: Response) => {
-  const parsed = createCategorySchema.parse(req.body);
+export const createCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const parsed = createCategorySchema.parse(req.body);
 
-  const category = await categoryService.createCategory(parsed);
+    const category = await categoryService.createCategory(parsed);
 
-  res.status(201).json({
-    success: true,
-    message: "Category created successfully",
-    data: category,
-  });
-};
+    return res
+      .status(201)
+      .json(new ApiResponse(201, category, "Category created successfully"));
+  },
+);
 
 // Get All
-export const getAllCategories = async (req: Request, res: Response) => {
-  const categories = await categoryService.getAllCategories();
+export const getAllCategories = asyncHandler(
+  async (req: Request, res: Response) => {
+    const categories = await categoryService.getAllCategories();
 
-  res.json({
-    success: true,
-    data: categories,
-  });
-};
-
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, categories, "Categories fetched successfully"),
+      );
+  },
+);
 // Get One
-export const getCategoryById = async (req: Request, res: Response) => {
-  const { id } = categoryParamsSchema.parse(req.params);
-  const category = await categoryService.getCategoryBid(id);
+export const getCategoryById = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = categoryParamsSchema.parse(req.params);
+    const category = await categoryService.getCategoryBid(id);
 
-  res.json({
-    success: true,
-    data: category,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, category, "Category fetched successfully"));
+  },
+);
 
 // Update
 
-export const updateCategory = async (req: Request, res: Response) => {
-  const parsed = updateCategorySchema.parse(req.body);
-  const { id } = categoryParamsSchema.parse(req.params);
-  const category = await categoryService.updateCategory(id, parsed);
+export const updateCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const parsed = updateCategorySchema.parse(req.body);
+    const { id } = categoryParamsSchema.parse(req.params);
+    const category = await categoryService.updateCategory(id, parsed);
 
-  res.json({
-    success: true,
-    message: "Category update",
-    data: category,
-  });
-};
+    return res
+      .status(200)
+      .json(new ApiResponse(200, category, "Category updated successfully"));
+  },
+);
 
 // Delete
-export const deleteCategory = async (req: Request, res: Response) => {
-  const { id } = categoryParamsSchema.parse(req.params);
-  await categoryService.deleteCategory(id);
+export const deleteCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = categoryParamsSchema.parse(req.params);
+    await categoryService.deleteCategory(id);
 
-  res.json({
-    success: true,
-    message: "Category delete",
-  });
-};
+    return res.status(200).json(new ApiResponse(200, null, "Category deleted"));
+  },
+);

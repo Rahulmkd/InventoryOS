@@ -8,9 +8,9 @@ const router = Router();
  * Public Routes
  */
 
-router.route("/register").post(authController.refresh);
+router.route("/register").post(authController.register);
 router.route("/login").post(authController.login);
-
+router.route("/refresh").post(authController.refresh);
 /**
  * Protected Routes
  */

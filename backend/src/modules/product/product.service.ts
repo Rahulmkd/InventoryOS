@@ -1,25 +1,31 @@
 import prisma from "../../prisma/client";
-
-// Create Product (with validation of relations)
+import { AppError } from "../../utils/app.error";
+/**
+ * CREATE PRODUCT
+ */
 export const createProduct = async (data: any) => {
   const { categoryId, supplierId } = data;
 
-  // Validate Category
+  // Validate category
   if (categoryId) {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },
     });
 
-    if (!category) throw new Error("Invalid categoryId");
+    if (!category) {
+      throw new AppError("Invalid categoryId", 400);
+    }
   }
 
-  // Validate Supplier
+  // Validate supplier
   if (supplierId) {
     const supplier = await prisma.supplier.findUnique({
       where: { id: supplierId },
     });
 
-    if (!supplier) throw new Error("Invalid supplierId");
+    if (!supplier) {
+      throw new AppError("Invalid supplierId", 400);
+    }
   }
 
   return prisma.product.create({
@@ -27,7 +33,9 @@ export const createProduct = async (data: any) => {
   });
 };
 
-// Get All Products (with relations)
+/**
+ * GET ALL PRODUCTS
+ */
 export const getAllProducts = async () => {
   return prisma.product.findMany({
     include: {
@@ -39,33 +47,55 @@ export const getAllProducts = async () => {
   });
 };
 
-// Get Single Product
+/**
+ * GET PRODUCT BY ID
+ */
 export const getProductById = async (id: string) => {
-  return prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { id },
     include: {
       category: true,
       supplier: true,
     },
   });
+
+  if (!product) {
+    throw new AppError("Product not found", 404);
+  }
+
+  return product;
 };
 
-// Update Product
+/**
+ * UPDATE PRODUCT
+ */
 export const updateProduct = async (id: string, data: any) => {
-  // Validate relations again
+  const existing = await prisma.product.findUnique({ where: { id } });
+
+  if (!existing) {
+    throw new AppError("Product not found", 404);
+  }
+
+  // Validate category
   if (data.categoryId) {
     const category = await prisma.category.findUnique({
       where: { id: data.categoryId },
     });
 
-    if (!category) throw new Error("Invalid categoryId");
+    if (!category) {
+      throw new AppError("Invalid categoryId", 400);
+    }
   }
+
+  // Validate supplier
   if (data.supplierId) {
     const supplier = await prisma.supplier.findUnique({
       where: { id: data.supplierId },
     });
 
-    if (!supplier) throw new Error("Invalid supplierId");
+    if (!supplier) {
+      throw new AppError("Invalid supplierId", 400);
+    }
   }
 
   return prisma.product.update({
@@ -74,20 +104,28 @@ export const updateProduct = async (id: string, data: any) => {
   });
 };
 
-// Delete Product
+/**
+ * DELETE PRODUCT
+ */
 export const deleteProduct = async (id: string) => {
+  const product = await prisma.product.findUnique({
+    where: { id },
+  });
+
+  if (!product) {
+    throw new AppError("Product not found", 404);
+  }
+
   return prisma.product.delete({
     where: { id },
   });
 };
 
-// Low Stock Products (IMPORTANT)
+/**
+ * LOW STOCK PRODUCTS
+ */
 export const getLowStockProducts = async () => {
-  return prisma.product.findMany({
-    where: {
-      quantity: {
-        lte: prisma.product.fields.lowStockThreshold,
-      },
-    },
-  });
+  const products = await prisma.product.findMany();
+
+  return products.filter((p) => p.quantity <= p.lowStockThreshold);
 };

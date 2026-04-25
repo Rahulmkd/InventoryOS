@@ -1,21 +1,22 @@
 import { Router } from "express";
 import * as productController from "./product.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
 const router = Router();
 
 router
   .route("/")
-  .post(productController.createProduct)
-  .get(productController.getAllProducts);
+  .post(authenticate, productController.createProduct)
+  .get(authenticate, productController.getAllProducts);
 
-router.route("/low-stock").get(productController.getLowStockProducts);
+router
+  .route("/low-stock")
+  .get(authenticate, productController.getLowStockProducts);
 
 router
   .route("/:id")
-  .get(productController.getProductById)
-  .put(productController.updateProduct)
-  .delete(productController.deleteProduct);
+  .get(authenticate, productController.getProductById)
+  .put(authenticate, productController.updateProduct)
+  .delete(authenticate, productController.deleteProduct);
 
 export default router;
-
-

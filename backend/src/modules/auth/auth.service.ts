@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import prisma from "../../prisma/client";
 import { env } from "../../config/env";
 import { RegisterInput, LoginInput } from "./auth.types";
-import { AppError } from "../../utils/AppError";
+import { AppError } from "../../utils/app.error";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt";
 
 /**
@@ -161,7 +161,6 @@ export const logoutUser = async (refreshToken: string) => {
 /**
  * LOGOUT ALL DEVICES
  */
-
 export const logoutAllSessions = async (userId: string) => {
   await prisma.refreshToken.deleteMany({
     where: { userId },

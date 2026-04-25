@@ -1,5 +1,6 @@
 import { TransactionType } from "@prisma/client";
 import prisma from "../../prisma/client";
+import { AppError } from "../../utils/app.error";
 
 // STOCK IN (Purchase)
 export const stockIn = async (
@@ -17,7 +18,9 @@ export const stockIn = async (
       where: { id: data.productId },
     });
 
-    if (!product) throw new Error("Product not found");
+    if (!product) {
+      throw new AppError("Product not found", 404);
+    }
 
     // 2. Update quantity
     const updatedProduct = await tx.product.update({
@@ -68,11 +71,13 @@ export const stockOut = async (
       where: { id: data.productId },
     });
 
-    if (!product) throw new Error("Product not found");
+    if (!product) {
+      throw new AppError("Product not found", 404);
+    }
 
-    // ! Prevent negative stock
+    // Prevent negative stock
     if (product.quantity < data.quantity) {
-      throw new Error("Insufficient stock");
+      throw new AppError("Insufficient stock", 400);
     }
 
     // Update quantity
